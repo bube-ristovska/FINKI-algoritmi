@@ -1,0 +1,14 @@
+package AIPS;
+
+import VezhbiZaSLL.SingleLinkedList;
+
+public class RunApp {
+//inicijalizacija i runnuvanje na nekoi metodi
+    public static void main(String[] args) {
+        SLL<String> linki = new SLL<String>();
+        linki.insertFirst("bube");
+        System.out.println(linki.getFirstNode());
+        linki.insertFirst("kiki");
+        System.out.println(linki.getFirstNode());
+    }
+}
