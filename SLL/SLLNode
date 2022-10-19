@@ -1,0 +1,15 @@
+package VezhbiZaSLL;
+
+public class SLLNode{
+    protected String data;
+    protected SLLNode link;
+
+    public SLLNode(String data) {
+        this.data = data;
+    }
+    /*najprvo se sozdava klasa za samo eden node so data i sledbenik
+    * konstruktorot e so eden argument*/
+
+  //tuka mozhe da ima override na printing metodi 
+    
+}
