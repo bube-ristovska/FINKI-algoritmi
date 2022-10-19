@@ -1,15 +1,19 @@
-package VezhbiZaSLL;
+package AIPS;
 
-public class SLLNode{
-    protected String data;
-    protected SLLNode link;
+public class SLLNode <E>{
+    protected E data;
+    protected SLLNode successor;
 
-    public SLLNode(String data) {
+    public SLLNode(E data, SLLNode successor) {
         this.data = data;
+        this.successor = successor;
     }
-    /*najprvo se sozdava klasa za samo eden node so data i sledbenik
-    * konstruktorot e so eden argument*/
 
-  //tuka mozhe da ima override na printing metodi 
-    
+    @Override
+    public String toString() {
+        return "SLLNode{" +
+                "data=" + data +
+                ", successor=" + successor +
+                '}';
+    }
 }
