@@ -1,0 +1,23 @@
+package Listi;
+
+public class ListApp {
+    public static void main(String[] args) {
+        SLLNode newNode = new SLLNode(5,null);
+        SLList lista = new SLList(newNode);
+        lista.addNodeFirst(6);
+        lista.addNodeFirst(33);
+        lista.addNodeAfter(6,88);
+        lista.addNodeBefore(88,69);
+        lista.addNodeAtEnd(66666);
+        lista.deleteHead();
+        lista.deleteAfter(69);
+        lista.deleteBefore(66666);//5ka jazol
+        lista.deleteLast();
+
+        SLLNode temp = lista.head;
+        while(temp != null){
+            System.out.println(temp);
+            temp = temp.link;
+        }
+    }
+}
