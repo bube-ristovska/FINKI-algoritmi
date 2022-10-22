@@ -1,0 +1,92 @@
+package Listi;
+
+public class SLList {
+    protected SLLNode head;
+
+    public SLList(SLLNode head) {
+        this.head = head;
+    }
+
+    public void addNodeFirst(int data){
+        if(head != null) {
+            SLLNode addedNode = new SLLNode(data, head);
+            head = addedNode;
+        }else{
+            SLLNode addedNode = new SLLNode(data, null);
+        }
+    }
+    public void addNodeAfter(int dataWho, int dataNew){
+        SLLNode temp = head;
+        while(temp != null){
+            if(temp.data == dataWho) {
+                SLLNode newAdded = new SLLNode(dataNew, null);
+                newAdded.link = temp.link;
+                temp.link = newAdded;
+            }
+                temp = temp.link;
+        }
+    }
+
+    public void addNodeBefore(int dataWho, int dataNew){
+        SLLNode temp = head;
+        while(temp != null){
+            if(temp.link.data == dataWho){
+                addNodeAfter(temp.data, dataNew);
+                break; //pazi ako go najde ne znachi deka kje prekine, mozhe da se poednostavi samo vo while ama vaka e porazbirlivo
+            }
+            temp = temp.link;
+        }
+    }
+
+    public void addNodeAtEnd(int dataNew){
+        SLLNode temp = head;
+        while(temp != null){
+            if(temp.link == null){
+                SLLNode newNode = new SLLNode(dataNew,null);
+                temp.link = newNode;
+                break; //isto taka mozhe vo while kako && da se poednostavi da nema potreba od break
+            }
+            temp = temp.link;
+        }
+    }
+
+    public void deleteHead(){ //hahahhahahahahahhahahahahahahahaha fino.
+       if(head == null || head.link == null){
+           System.out.println("Listata e prazna ili ima samo eden element");
+       }
+        head = head.link;
+    }
+
+    public void deleteAfter(int dataFind){
+        SLLNode temp = head;
+        while (temp != null){
+            if(temp.data == dataFind){ //ne kompliciraj za dzabe crtaj si <3
+                temp.link = temp.link.link;
+                break;
+            }
+            temp = temp.link;
+        }
+    }
+
+    public void deleteBefore(int dataFind){
+        SLLNode temp = head;
+        while (temp != null){
+            if(temp.link.link.data == dataFind){
+                temp.link = temp.link.link;
+                break;
+            }
+            temp = temp.link;
+        }
+    }
+
+    public void deleteLast(){
+        SLLNode temp = head;
+        while (temp.link.link != null){ //se dodeka ne dojde do pretposledniot
+            temp = temp.link; //vrti
+        }
+        temp.link = null; //doagja do pretposledniot, therefore postavi go negoviot sledbenik null
+    }
+
+
+
+}
