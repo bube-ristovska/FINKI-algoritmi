@@ -1,0 +1,33 @@
+package Lab1Aips;
+import java.util.Scanner;
+
+public class Initials {
+
+    static void printInitials(String name)
+    {
+        name = name.toUpperCase(); //gi pravi site bukvi da se golemi
+
+        System.out.print(name.charAt(0)); //prvata bukva od imeto
+
+        for(int i = 0; i < name.length(); i++){ //for loop bidejki ne znaeme kolku middle names ima
+            if(name.charAt(i) == ' '){ //prazno mesto go definirame ne so dvojni navodnici bidejki e char a ne string!!!
+                System.out.print(name.charAt(i+1));
+            }
+        }
+    }
+
+    public static void main(String args[])
+    {
+        Scanner input = new Scanner(System.in);
+        int n=input.nextInt();
+        String name;
+        input.nextLine();
+
+        for(int i=0; i<n; i++){
+            name = input.nextLine();
+            printInitials(name);
+            System.out.println();
+        }
+    }
+}
+
