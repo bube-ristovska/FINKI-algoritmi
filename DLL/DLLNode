@@ -1,0 +1,20 @@
+package ListiAud;
+
+public class DLLNode {
+    protected int data;
+    protected DLLNode rlink;
+    protected DLLNode llink;
+
+    public DLLNode(int data, DLLNode rlink, DLLNode llink) {
+        this.data = data;
+        this.rlink = rlink;
+        this.llink = llink;
+    }
+
+    @Override
+    public String toString() {
+        return "DLLNode{" +
+                "data=" + data +
+                '}';
+    }
+}
