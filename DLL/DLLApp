@@ -1,0 +1,21 @@
+package ListiAud;
+
+public class DLLApp {
+    public static void main(String[] args) {
+        DLLNode first = new DLLNode(5,null,null);
+        DLList lista = new DLList(first);
+        DLLNode second = new DLLNode(6,null, first);
+        first.rlink = second;
+        lista.addHead(333);
+        lista.addHead(444);
+        lista.addBetween(333, 5, 77);
+        lista.deleteHead();
+        lista.deleteNode(77);
+        lista.deleteLast();
+        DLLNode temp = lista.head;
+        while(temp !=null) {
+            System.out.println(temp);
+            temp = temp.rlink;
+        }
+    }
+}
