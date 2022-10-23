@@ -1,0 +1,65 @@
+package ListiAud;
+
+public class DLList {
+   protected DLLNode head;
+
+    public DLList(DLLNode head) {
+        this.head = head;
+    }
+
+    public void addHead(int newData){
+        DLLNode newNode = new DLLNode(newData,null,null);
+        if(head != null){
+            head.llink = newNode;
+            newNode.rlink = head;
+            head = newNode;
+        }
+        else{
+            head = newNode;
+        }
+    }
+
+    public void addBetween(int beforeData, int afterData, int newData){
+        DLLNode temp = head;
+        DLLNode newNode = new DLLNode(newData, null,null);
+        while(temp != null){
+            if(temp.data == beforeData && temp.rlink.data == afterData){
+                newNode.llink = temp;
+                newNode.rlink = temp.rlink;
+                temp.rlink.llink = newNode;
+                temp.rlink = newNode;
+                break;
+            }
+            temp = temp.rlink;
+        }
+    }
+    public void deleteHead(){
+        if(head != null){
+            head.rlink.llink = null;
+            head = head.rlink;
+        }
+        else{
+            System.out.println("Listata e prazna");
+        }
+    }
+
+    public void deleteNode(int dataForDeletion){
+        DLLNode temp = head;
+        while(temp != null){
+            if(temp.data == dataForDeletion){
+                temp.llink.rlink = temp.rlink;
+                temp.rlink.llink = temp.llink;
+                break;
+            }
+            temp = temp.rlink;
+        }
+    }
+
+    public void deleteLast(){
+        DLLNode temp = head;
+        while(temp.rlink != null){
+            temp = temp.rlink;
+        }
+        temp.llink.rlink = null;
+    }
+}
