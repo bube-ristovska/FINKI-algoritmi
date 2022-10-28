@@ -1,0 +1,130 @@
+//package AIPS;
+
+import java.util.Scanner;
+
+class RabotnaNedela{
+
+    private int [] casovi;
+    private int brNedela;
+
+    public RabotnaNedela() {
+        //default constructor
+    }
+
+    public RabotnaNedela(int[] casovi, int brNedela) {
+        super();
+        this.casovi = casovi;
+        this.brNedela = brNedela;
+    }
+    @Override
+    public String toString() {
+        return " ";
+    }
+
+    public void setCasovi(int[] casovi) {
+        this.casovi = casovi;
+    }
+
+    public void setBrNedela(int brNedela) {
+        this.brNedela = brNedela;
+    }
+    public int casovi(){
+        int n =  0;
+        for (int i = 0; i < casovi.length; i++) {
+            n+=casovi[i];
+        }
+        return n;
+    }
+
+}
+
+class Rabotnik{
+
+    private String ime;
+    private RabotnaNedela [] nedeli;
+
+    public Rabotnik(String ime, RabotnaNedela[] nedeli) {
+        super();
+        this.ime = ime;
+        this.nedeli = nedeli;
+    }
+    @Override
+    public String toString() {
+        StringBuilder s=new StringBuilder();
+        s.append(ime);
+        int sum=0;
+        for(int i=0;i< nedeli.length;i++)
+        {
+            sum+=nedeli[i].casovi();
+            s.append("   "+nedeli[i].casovi());
+
+        }
+        s.append("   "+ sum);
+        return s.toString();
+    }
+
+    public String getIme() {
+        return ime;
+    }
+
+    public RabotnaNedela[] getNedeli() {
+        return nedeli;
+    }
+}
+
+public class Main {
+    public static int sumNedeli(Rabotnik r) {
+        int s = 0;
+        for (int i = 0; i < r.getNedeli().length; i++) {
+            s+=r.getNedeli()[i].casovi();
+        }
+        return s;
+    }
+    public static Rabotnik najvreden_rabotnik(Rabotnik [] niza)
+    {
+        int maxIndex = 0;
+        for (int i = 0; i < niza.length; i++) {
+            if(sumNedeli(niza[i]) > sumNedeli(niza[maxIndex])){
+                maxIndex = i;
+            }
+        }
+        return niza[maxIndex];
+    }
+    public static void table(Rabotnik [] niza)
+    {
+        System.out.println("Rab   1   2   3   4   Vkupno");
+        for(int i = 0; i < niza.length; i++){ //for each rabotnik vo niza
+            System.out.println(niza[i]);
+        }
+    }
+
+    public static void main(String[] args) {
+        int RABOTNI_NEDELI = 4;
+        int RABOTNI_DENOVI = 5;
+        int n;
+        Scanner input = new Scanner(System.in);
+        n = input.nextInt();
+        Rabotnik [] niza = new Rabotnik[n];
+        for(int i=0;i<n;i++)
+        {
+            String ime;
+            input.nextLine();
+            ime = input.nextLine();
+            RabotnaNedela [] rabotniNedeli = new RabotnaNedela[RABOTNI_NEDELI];
+            for(int j = 0; j < RABOTNI_NEDELI; j++){
+                int [] casovi = new int [RABOTNI_DENOVI];
+                for(int m = 0; m < RABOTNI_DENOVI; m++){
+                    casovi[m] = input.nextInt();
+                }
+                rabotniNedeli[j] = new RabotnaNedela(casovi, j+1);
+            }
+            niza[i] = new Rabotnik(ime, rabotniNedeli);
+        }
+
+        table(niza);
+        System.out.println("\nNAJVREDEN RABOTNIK: " +najvreden_rabotnik(niza).getIme());
+
+    }
+}
+
+
