@@ -1,0 +1,45 @@
+import java.util.Scanner;
+
+public class GreedyCoins {
+    
+     public static int minNumCoins(int coins[], int sum) {
+        int cnt = 0;
+        //5 1 2 10
+        //19
+        //rezultat 4 kolku paricki min
+        //predlog: da ima prvo bubble sort i posle delish so toa ako bez ostatok odzemi go od sum samo
+        for (int i = 0; i < (coins.length)-1; i++) {
+            for (int j = 0; j < (coins.length)-i-1; j++) {
+                if (coins[j] < coins[j + 1]) {
+                    int temp = coins[j];
+                    coins[j] = coins[j + 1];
+                    coins[j + 1] = temp;
+                }
+            }
+        }
+        for (int i = 0; i < (coins.length); i++) {
+            if(sum > 0){
+                while(coins[i] <= sum){
+                    sum-=coins[i];
+                    cnt++;
+                }
+            }
+        }
+        return cnt;
+    }
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+
+        String coinsStringLine = input.nextLine();
+        String coinsString[] = coinsStringLine.split(" ");
+        int coins[] = new int[coinsString.length];
+        for(int i=0;i<coinsString.length;i++) {
+            coins[i] = Integer.parseInt(coinsString[i]);
+        }
+        
+        int sum = input.nextInt();
+
+        System.out.println(minNumCoins(coins, sum));
+    }
+}
