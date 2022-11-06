@@ -1,0 +1,35 @@
+import java.util.Scanner;
+
+public class MinDistance {
+
+    public static float minimalDistance(float points[][]) {
+        double distance, minDistance = 1000000; 
+        int until = points.length;
+        for (int i = 0; i < until+1; i++) {
+            for (int j = i+1; j < until; j++) {
+                distance = ((points[j][0] - points[i][0])*(points[j][0] - points[i][0]))+
+                           ((points[j][1] - points[i][1])*(points[j][1] - points[i][1]));
+                distance = Math.sqrt(distance);
+                if(distance < minDistance){
+                    minDistance = distance;
+                }
+            }
+        }
+        return (float)minDistance;
+    }
+
+    public static void main(String [] args) {
+        Scanner input = new Scanner(System.in);
+
+        int N = input.nextInt();
+
+        float points[][] = new float[N][2];
+
+        for(int i=0;i<N;i++) {
+            points[i][0] = input.nextFloat();
+            points[i][1] = input.nextFloat();
+        }
+
+        System.out.printf("%.2f\n", minimalDistance(points));
+    }
+}
