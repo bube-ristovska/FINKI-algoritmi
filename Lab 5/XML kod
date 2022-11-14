@@ -1,0 +1,48 @@
+//package AIPS;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.NoSuchElementException;
+import java.util.Stack;
+
+public class CheckXML {
+
+    public static int checking(String [] kod, int n){
+        Stack<String> stack = new Stack<String>();
+        for (int i = 0; i < n; i++) {
+            if(kod[i].charAt(0) == '['){
+                if(kod[i].charAt(1) == '/'){
+                    if(!(stack.pop().substring(1).equals(kod[i].substring(2)))){
+                        return 0;
+                    }
+                }
+                else{
+                    stack.push(kod[i]);
+                }
+            }
+
+        }
+        return 1;
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        int n = Integer.parseInt(s);
+        String [] redovi = new String[n];
+
+        for(int i=0;i<n;i++)
+            redovi[i] = br.readLine();
+
+        int valid;
+
+        valid = checking(redovi, n);
+
+        System.out.println(valid);
+
+        br.close();
+    }
+}
