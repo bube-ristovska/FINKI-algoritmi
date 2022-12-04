@@ -1,0 +1,64 @@
+//package AIPS_prva;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class OddEvenSort {
+    static void swap(int[] arr, int i, int j)
+    {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    static void bubbleSort_increasing(int arr[],int n) {
+        for (int i = 0; i < n - 1; i++)
+            for (int j = 0; j < n - i - 1; j++)
+                if (arr[j] > arr[j + 1]) {
+                    swap(arr, j, j+1);
+                }
+    }
+    static void bubbleSort_decreasing(int arr[],int n) {
+        for (int i = 0; i < n - 1; i++)
+            for (int j = 0; j < n - i - 1; j++)
+                if (arr[j] < arr[j + 1]) {
+                    swap(arr, j, j+1);
+                }
+    }
+
+    static void oddEvenSort(int a[], int n)
+    {
+        int [] parni = new int[n];
+        int cntP=0;
+        int [] neparni = new int[n];
+        int cntN=0;
+        for (int i = 0; i < n; i++) {
+            if(a[i]%2==0) parni[cntP++] = a[i];
+            else neparni[cntN++]=a[i];
+        }
+        bubbleSort_increasing(neparni, cntN);
+        bubbleSort_decreasing(parni, cntP);
+
+        for (int i = 0, j = 0; i < n; i++) {
+            if(i >= 0 && i < cntN) a[i] = neparni[i];
+            else a[i] = parni[j++];
+        }
+    }
+
+    public static void main(String[] args) throws IOException{
+        int i;
+        BufferedReader stdin = new BufferedReader( new InputStreamReader(System.in));
+        String s = stdin.readLine();
+        int n = Integer.parseInt(s);
+
+        s = stdin.readLine();
+        String [] pom = s.split(" ");
+        int [] a = new int[n];
+        for(i=0;i<n;i++)
+            a[i]=Integer.parseInt(pom[i]);
+        oddEvenSort(a,n);
+        for(i=0;i<n-1;i++)
+            System.out.print(a[i]+" ");
+        System.out.print(a[i]);
+    }
+}
