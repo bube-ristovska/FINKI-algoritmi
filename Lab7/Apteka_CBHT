@@ -1,0 +1,139 @@
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.*;
+
+
+class Naracan{
+    String ime;
+    int kolicina;
+
+    public Naracan(String ime, int kolicina) {
+        this.ime = ime;
+        this.kolicina = kolicina;
+    }
+}
+class Lek{
+    String ime;
+    int postoi;
+    int cena;
+    int parcinja;
+    char s1, s2, s3;
+
+    public Lek(String ime, int postoi, int cena, int parcinja) {
+        this.ime = ime;
+        this.postoi = postoi;
+        this.cena = cena;
+        this.parcinja = parcinja;
+        s1 = ime.charAt(0);
+        s2 = ime.charAt(1);
+        s3 = ime.charAt(2);
+    }
+
+    public int getS1() {
+        return Character.toUpperCase(s1);
+    }
+
+    public int getS2() {
+        return Character.toUpperCase(s2);
+    }
+
+    public int getS3() {
+        return Character.toUpperCase(s3);
+    }
+
+    public boolean equals(Naracan o) {
+        return ime.toUpperCase().equals(o.ime.toUpperCase());
+    }
+
+}
+class Lekovi {
+    List<Lek> lekovi;
+    List<Naracan> naracki;
+
+    Map<String, Lek> map = new HashMap<>();
+
+    public Lekovi() {
+        lekovi = new ArrayList<>();
+        naracki = new ArrayList<>();
+    }
+
+    public void read(InputStream in) {
+        Scanner scanner = new Scanner(in);
+        int n = Integer.parseInt(scanner.nextLine());
+        lekovi = new ArrayList<>();
+        naracki = new ArrayList<>();
+        for (int i = 0; i < n; i++) { //chitanje na pochetnite liniii
+            //ACEROLA(0) 0(1 nema) 100(2 cena) 1000(3 broj parcinja)
+            String [] deleno = scanner.nextLine().split("\\s");
+            Lek lek1 = new Lek(deleno[0], Integer.parseInt(deleno[1]), Integer.parseInt(deleno[2]),Integer.parseInt(deleno[3]));
+            lekovi.add(lek1);
+        }
+        while(true){
+            String naracka = scanner.nextLine();
+            if(naracka.equals("KRAJ")) break;
+            else{
+                String kol = scanner.nextLine();
+                int kolicina = Integer.parseInt(kol);
+                Naracan naracan = new Naracan(naracka, kolicina);
+                naracki.add(naracan);
+            }
+        }
+        scanner.close();
+    }
+
+    public void put_into_hash_table(){
+        for (Lek lek : lekovi) {
+            map.put(lek.ime.toUpperCase(), lek);
+        }
+    }
+
+
+
+    public int hashCode(int s1, int s2, int s3) {
+        return (29*(29*s1+s2)%102780+s3) % map.size();
+    }
+
+    public void print(PrintStream out) {
+
+        PrintWriter printWriter = new PrintWriter(out);
+        put_into_hash_table();
+
+        for (int i = 0; i < naracki.size(); i++) {
+            String key = naracki.get(i).ime.toUpperCase();
+            Lek proverka = map.get(key);
+            if(proverka == null) printWriter.println("Nema takov lek");
+            else if(proverka.ime.toUpperCase().equals(naracki.get(i).ime.toUpperCase())){
+                printWriter.println(key.toUpperCase());
+                printWriter.println(proverka.postoi == 1? "POZ":"NEG");
+                printWriter.println(proverka.cena);
+                printWriter.println(proverka.parcinja);
+                if(naracki.get(i).kolicina <= proverka.parcinja){
+                    proverka.parcinja -=naracki.get(i).kolicina;
+                    printWriter.println("Napravena naracka");
+                }
+                else{
+                    printWriter.println("Nema dovolno lekovi");
+                }
+            }
+            else{
+                printWriter.println("Nema takov lek");
+            }
+
+        }
+        printWriter.flush();
+    }
+}
+
+
+
+public class LekoviAppTest {
+    public static void main(String[] args) {
+        Lekovi ll = new Lekovi();
+
+        ll.read(System.in);
+        ll.print(System.out);
+
+
+    }
+}
