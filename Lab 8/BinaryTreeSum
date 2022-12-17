@@ -1,0 +1,211 @@
+package LABSAIPS;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
+
+
+class BNode<E> {
+
+    public E info;
+    public BNode<E> left;
+    public BNode<E> right;
+
+    static int LEFT = 1;
+    static int RIGHT = 2;
+    @SuppressWarnings("unchecked")
+
+    public BNode(E info) {
+        this.info = info;
+        left = null;
+        right = null;
+    }
+    @SuppressWarnings("unchecked")
+
+    public BNode() {
+        this.info = null;
+        left = null;
+        right = null;
+    }
+    @SuppressWarnings("unchecked")
+
+    public BNode(E info, BNode<E> left, BNode<E> right) {
+        this.info = info;
+        this.left = left;
+        this.right = right;
+    }
+
+}
+
+class BTree<E extends Comparable<E>> {
+
+    public BNode<E> root;
+    @SuppressWarnings("unchecked")
+
+    public BTree() {
+        root = null;
+    }
+    @SuppressWarnings("unchecked")
+
+    public BTree(E info) {
+        root = new BNode<E>(info);
+    }
+    @SuppressWarnings("unchecked")
+    public void makeRoot(E elem) {
+        root = new BNode(elem);
+    }
+    @SuppressWarnings("unchecked")
+    public void makeRootNode(BNode<E> node) {
+        root = node;
+    }
+    @SuppressWarnings("unchecked")
+    public BNode<E> addChild(BNode<E> node, int where, E elem) {
+
+        BNode<E> tmp = new BNode<E>(elem);
+
+        if (where == BNode.LEFT) {
+            if (node.left != null)  // veke postoi element
+                return null;
+            node.left = tmp;
+        } else {
+            if (node.right != null) // veke postoi element
+                return null;
+            node.right = tmp;
+        }
+
+        return tmp;
+    }
+    @SuppressWarnings("unchecked")
+    public BNode<E> addChildNode(BNode<E> node, int where, BNode<E> tmp) {
+
+        if (where == BNode.LEFT) {
+            if (node.left != null)  // veke postoi element
+                return null;
+            node.left = tmp;
+        } else {
+            if (node.right != null) // veke postoi element
+                return null;
+            node.right = tmp;
+        }
+
+        return tmp;
+    }
+    @SuppressWarnings("unchecked")
+    public BNode<E> find_x(int x){
+        Stack<BNode<E>> stek = new Stack<>();
+        stek.push(root);
+        while(!stek.isEmpty()){
+            BNode<E> pom = stek.peek();
+            if((Integer) pom.info == x) return stek.peek();
+            stek.pop();
+            if(pom.right!=null){
+                stek.push(pom.right);
+            }
+            if(pom.left!=null){
+                stek.push(pom.left);
+            }
+        }
+        return new BNode<E>(); //ne postoi baraniot node
+    }
+
+
+}
+
+public class BinaryTreeSum {
+
+
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) throws Exception {
+        int i, j, k;
+        int index;
+        String action;
+
+        String line;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        int N = Integer.parseInt(br.readLine());
+
+        BNode<Integer> nodes[] = new BNode[N];
+        BTree<Integer> tree = new BTree<Integer>();
+
+        for (i=0;i<N;i++)
+            nodes[i] = new BNode<Integer>();
+
+        for (i = 0; i < N; i++) {
+            line = br.readLine();
+            st = new StringTokenizer(line);
+            index = Integer.parseInt(st.nextToken());
+            nodes[index].info = Integer.parseInt(st.nextToken());
+            action = st.nextToken();
+            if (action.equals("LEFT")) {
+                tree.addChildNode(nodes[Integer.parseInt(st.nextToken())], BNode.LEFT, nodes[index]);
+            } else if (action.equals("RIGHT")) {
+                tree.addChildNode(nodes[Integer.parseInt(st.nextToken())], BNode.RIGHT, nodes[index]);
+            } else {
+                // this node is the root
+                tree.makeRootNode(nodes[index]);
+            }
+        }
+
+        int baranaVrednost=Integer.parseInt(br.readLine());
+
+        br.close();
+
+        BNode<Integer> baranNode = tree.find_x(baranaVrednost);
+
+        //za levo poddrvo
+        BNode<Integer> levoPoddrvoRoot = baranNode.left;
+        BNode<Integer> desnoPoddrvoRoot = baranNode.right;
+
+        //za levo ni trebaat pomalite od nego
+        Stack<BNode<Integer>> stek = new Stack<>();
+        if(levoPoddrvoRoot!= null)stek.push(levoPoddrvoRoot);
+        List<Integer> leviVrednosti = new ArrayList<>();
+        while (!stek.isEmpty()){
+            BNode<Integer> pom = stek.peek();
+            leviVrednosti.add(stek.pop().info);
+
+            if(pom.right != null){
+                stek.push(pom.right);
+            }
+            if(pom.left != null){
+                stek.push(pom.left);
+            }
+        }
+        int s1 = 0;
+        if(leviVrednosti.size() != 0) {
+            for (Integer integer : leviVrednosti) {
+                if (integer < baranaVrednost) s1 += integer;
+            }
+        }
+
+
+        //za desno ni trebaat pogolemite od nego
+        List<Integer> desniVrednosti = new ArrayList<>();
+        if(desnoPoddrvoRoot!=null)stek.push(desnoPoddrvoRoot);
+        while (!stek.isEmpty()){
+            BNode<Integer> pom = stek.peek();
+            desniVrednosti.add(stek.pop().info);
+
+            if(pom.right!=null){
+                stek.push(pom.right);
+            }
+            if(pom.left!=null){
+                stek.push(pom.left);
+            }
+        }
+        int s2  = 0;
+        if(desniVrednosti.size() != 0){
+            for (Integer integer : desniVrednosti) {
+                if(integer > baranaVrednost) s2+= integer;
+            }
+        }
+        System.out.println(s1 + " " + s2);
+    }
+}
