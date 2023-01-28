@@ -1,0 +1,316 @@
+package Zad;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+interface Tree {
+    // //////////Accessors ////////////
+
+    public Tree.Node root();
+
+    public Tree.Node parent(Tree.Node node);
+
+    public int childCount(Tree.Node node);
+
+    // //////////Transformers ////////////
+    public void makeRoot(Object elem);
+
+    public Tree.Node addChild(Tree.Node node, Object elem);
+
+    public void remove(Tree.Node node);
+
+    // //////Inner interface for tree nodes ////////
+    public interface Node {
+
+        public Object getElement();
+
+        public void setElement(Object elem);
+
+    }
+};
+
+class SLLTree implements Tree {
+
+    // SLLNode is the implementation of the Node interface
+    class SLLNode implements Node {
+
+        // Holds the links to the needed nodes
+        SLLNode parent, sibling, firstChild;
+
+        // Hold the data
+        Sorabotnik element;
+        public SLLNode() {
+            element = new Sorabotnik();
+            parent = sibling = firstChild = null;
+        }
+
+        public SLLNode(Sorabotnik o) {
+            element = o;
+            parent = sibling = firstChild = null;
+        }
+
+        public Sorabotnik getElement() {
+            return element;
+        }
+
+        public void setElement(Object o) {
+            element = (Sorabotnik)o;
+        }
+
+
+    }
+
+    protected SLLNode root;
+
+    public SLLTree() {
+        root = null;
+    }
+
+    public Node root() {
+        return root;
+    }
+
+    public Tree.Node parent(Tree.Node node) {
+        return ((SLLNode) node).parent;
+    }
+
+    public int childCount(Tree.Node node) {
+        SLLNode tmp = ((SLLNode) node).firstChild;
+        int num = 0;
+        while (tmp != null) {
+            tmp = tmp.sibling;
+            num++;
+        }
+        return num;
+    }
+
+    public void makeRoot(Object elem) {
+        root = new SLLNode((Sorabotnik)elem);
+    }
+
+    public Node addChild(Node node, Object elem) {
+        SLLNode tmp = new SLLNode((Sorabotnik)elem);
+        SLLNode curr = (SLLNode) node;
+        tmp.sibling = curr.firstChild;
+        curr.firstChild = tmp;
+        tmp.parent = curr;
+        return tmp;
+    }
+
+    public void remove(Node node) {
+        SLLNode curr = (SLLNode) node;
+        if (curr.parent != null) {
+            if (curr.parent.firstChild == curr) {
+                // The node is the first child of its parent
+                // Reconnect the parent to the next sibling
+                curr.parent.firstChild = curr.sibling;
+            } else {
+                // The node is not the first child of its parent
+                // Start from the first and search the node in the sibling list
+                // and remove it
+                SLLNode tmp = curr.parent.firstChild;
+                while (tmp.sibling != curr) {
+                    tmp = tmp.sibling;
+                }
+                tmp.sibling = curr.sibling;
+            }
+        } else {
+            root = null;
+        }
+    }
+
+    void printTreeRecursive(Node node, int level) {
+        if (node == null)
+            return;
+        int i;
+        SLLNode tmp;
+
+        for (i = 0; i < level; i++)
+            System.out.print("  ");
+        System.out.println(node.getElement().toString());
+        tmp = ((SLLNode) node).firstChild;
+        while (tmp != null) {
+            printTreeRecursive(tmp, level + 1);
+            tmp = tmp.sibling;
+        }
+    }
+
+    public void printTree() {
+        printTreeRecursive(root, 0);
+    }
+
+    //vasiot kod sleduva nadolu
+    //treba da se implementiraat 4-te metodi
+
+    SLLNode tmp = new SLLNode();
+    public SLLNode findNode(int id) {
+        traverse(root, id);
+        return tmp;
+    }
+
+
+    public void traverse(SLLNode node, int id){
+        if(node.element.ID == id) tmp = node;
+        if(node.firstChild != null){
+            SLLNode temp = node.firstChild;
+            while(temp != null){
+                traverse(temp, id);
+                temp = temp.sibling;
+            }
+        }
+    }
+
+    public Node addSorabotnik(int id, String imeSorabotnik, int idMentor) {
+        SLLNode mentor = findNode(idMentor);
+        char nivo = 'A';
+        int pocetniPoeni = 0;
+        switch (mentor.element.nivo){
+            case 'B': break;
+            case 'C': pocetniPoeni= 300; break;
+            case 'D': pocetniPoeni= 1000; break;
+            case 'E': pocetniPoeni= 3000; break;
+        }
+        switch (mentor.element.nivo){
+            case 'B': break;
+            case 'C': nivo = 'B'; break;
+            case 'D': nivo = 'C'; break;
+            case 'E': nivo = 'D'; break;
+        }
+        
+        Sorabotnik nov_rabotnik = new Sorabotnik(id, imeSorabotnik, nivo, pocetniPoeni);
+        addChild(mentor, nov_rabotnik);
+        return new SLLNode(nov_rabotnik);
+    }
+
+    public void printTreeSorabotnik(int id) {
+        printTreeRecursive(findNode(id), 0);
+    }
+
+    public boolean checkIfNivo(char nivo, int poeni){
+        return switch (nivo) {
+            case 'A' -> poeni >= 300;
+            case 'B' -> poeni >= 1000;
+            case 'C' -> poeni >= 3000;
+            default -> false;
+        };
+    }
+    public void azuriraj(int id, int poeni) {
+        SLLNode nod = findNode(id);
+        nod.element.setPoeni(poeni);
+        if(checkIfNivo(nod.element.nivo, nod.element.poeni)){
+            nod.parent.sibling = nod;
+            nod.sibling = nod.parent;
+            nod.parent = nod.sibling.parent;
+        }
+    }
+
+};
+
+class Sorabotnik {
+    int ID;
+    String ime;
+    char nivo;
+    int poeni;
+
+    public Sorabotnik() {
+        this.nivo = 'A';
+        this.poeni = 0;
+    }
+
+    public Sorabotnik(int ID, String ime, char nivo, int poeni){
+        this.ID = ID;
+        this.ime = ime;
+        this.nivo = nivo;
+        this.poeni = poeni;
+    }
+
+    public int getPoeni() {
+        return poeni;
+    }
+
+    public void setPoeni(int poeni) {
+        this.poeni = poeni;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public char getNivo() {
+        return nivo;
+    }
+
+    public void setNivo(char nivo) {
+        this.nivo = nivo;
+    }
+
+    public void setID(int iD) {
+        ID = iD;
+    }
+
+    public String getIme() {
+        return ime;
+    }
+
+    public void setIme(String ime) {
+        this.ime = ime;
+    }
+
+    public String toString(){
+        String s = new String();
+        s = this.ID + " " + this.ime + " -> pozicija: " + this.nivo + " -> poeni: " + this.poeni;
+        return s;
+    }
+};
+
+public class Multilevel {
+
+    public static void main(String[] args) throws NumberFormatException, IOException {
+
+        //nisto ne smeete da menuvate vo funkcijata main()
+        Tree.Node a1, a2, a3, a4, b, c1, c2, d, e;
+
+        SLLTree t = new SLLTree();
+
+        t.makeRoot(new Sorabotnik(0, "Boss", 'E', 100000));
+
+        d = t.addChild(t.root, new Sorabotnik(11, "S1", 'D', 10000));
+        c2 = t.addChild(d, new Sorabotnik(22, "S22", 'C', 3000));
+        c1 = t.addChild(t.root, new Sorabotnik(12, "S21", 'C', 4500));
+        b = t.addChild(c2, new Sorabotnik(31, "S31", 'B', 800));
+        a1 = t.addChild(c1, new Sorabotnik(41, "S41", 'A', 0));
+        a2 = t.addChild(b, new Sorabotnik(42, "S42", 'A', 100));
+        a3 = t.addChild(b, new Sorabotnik(43, "S43", 'A', 290));
+        a3 = t.addChild(b, new Sorabotnik(44, "S44", 'A', 0));
+
+        t.printTree();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n_sorabotnici = Integer.parseInt(br.readLine());
+        int n_azuriranja = Integer.parseInt(br.readLine());
+        String pom[], ime;
+        int id, idm, p;
+        for(int i=0; i<n_sorabotnici; i++)
+        {
+            pom = br.readLine().split(" ");
+            id = Integer.parseInt(pom[0]);
+            ime = pom[1];
+            idm = Integer.parseInt(pom[2]);
+            t.addSorabotnik(id, ime, idm);
+        }
+        for(int i=0; i<n_azuriranja; i++)
+        {
+            pom = br.readLine().split(" ");
+            id = Integer.parseInt(pom[0]);
+            p = Integer.parseInt(pom[1]);
+            t.azuriraj(id, p);
+        }
+        id = Integer.parseInt(br.readLine());
+        System.out.println("Posle intervencijata vo drvoto:");
+        t.printTree();
+        System.out.println("Sorabotnici direktni i indirektni na " + id + " se:");
+        t.printTreeSorabotnik(id);
+
+    }
+}
