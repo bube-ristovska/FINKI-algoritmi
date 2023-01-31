@@ -1,0 +1,39 @@
+package Zad;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
+
+public class Umbrella {
+
+    public static void main(String[] args) throws Exception {
+        int i,j,k;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int N = Integer.parseInt(st.nextToken());
+        int D = Integer.parseInt(st.nextToken());
+
+        int positions[] = new int[N];
+
+        for (i=0;i<N;i++) {
+            positions[i] = Integer.parseInt(br.readLine());
+        }
+
+        br.close();
+
+       positions = Arrays.stream(positions).sorted().toArray();
+       int cador = 1;
+       int poc = positions[0];
+        for (i = 1; i < N; i++) {
+            if(!(positions[i] - poc <=D)){
+                poc = positions[i];
+                cador++;
+            }
+        }
+        System.out.println(cador);
+    }
+
+}
