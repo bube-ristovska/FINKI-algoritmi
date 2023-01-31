@@ -1,0 +1,81 @@
+package ZarazeniGradovi;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+
+class Program implements Comparable<Program>{
+    int priority;
+    int time;
+
+    public Program(int priority, int time) {
+        this.priority = priority;
+        this.time = time;
+    }
+
+    @Override
+    public int compareTo(Program o) {
+        return Integer.compare(priority, o.priority);
+    }
+}
+
+public class ComputerPrograms {
+
+
+
+    public static void main(String[] args) throws Exception {
+        int i,j,k;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+
+        int executionTimes[] = new int[N];
+        int priorities[] = new int[N];
+
+        for (i=0;i<N;i++) {
+            st = new StringTokenizer(br.readLine());
+            executionTimes[i] = Integer.parseInt(st.nextToken());
+            priorities[i] = Integer.parseInt(st.nextToken());
+        }
+
+        br.close();
+
+        List<Program> programi = new ArrayList<>();
+        for (int l = 0; l < N; l++) {
+            Program p = new Program(priorities[l],executionTimes[l]);
+            programi.add(p);
+        }
+        programi = programi.stream().sorted().collect(Collectors.toList());
+
+        int cnt = 1;
+        int local_computer = programi.get(0).time;
+        int prethoden_prioritet = programi.get(0).priority;
+        for (i = 1; i < N; i++) {
+            Program momentalna = programi.get(i);
+            if(momentalna.priority == prethoden_prioritet){
+                if(local_computer + momentalna.time <= M){
+                    local_computer+= momentalna.time;
+                }
+                else{
+                    cnt++;
+                    local_computer = programi.get(i).time;
+                }
+            }
+            else{
+                cnt++;
+                local_computer = programi.get(i).time;
+            }
+            prethoden_prioritet = momentalna.priority;
+        }
+        System.out.println(cnt);
+
+
+
+    }
+
+}
