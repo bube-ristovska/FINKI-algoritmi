@@ -1,0 +1,203 @@
+package SneznaBura;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+
+public class SnowStorm {
+
+    public static void main(String[] args) throws Exception {
+        int i, j, k;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int N = Integer.parseInt(br.readLine());		// broj na gradovi
+        Graph g = new Graph(N);							// treba da se raboti so ovoj graf
+
+        for (i = 0; i < N; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            st.nextToken();
+            String str_zatrupan = st.nextToken();
+            if (str_zatrupan.equals("da")) {
+                g.adjList[i] = new GraphNode(i, new City(true));
+            } else {
+                g.adjList[i] = new GraphNode(i, new City(false));
+            }
+
+        }
+
+        int M = Integer.parseInt(br.readLine());		// broj na rabovi
+        for (i = 0; i < M; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            g.addEdge(a, b);
+            g.addEdge(b, a);
+        }
+
+        int pocetok = Integer.parseInt(br.readLine());	// poceten grad
+        List<Integer> visited = new ArrayList<>();
+
+
+        int cnt = 0, zatrupan = 1;
+        kamion(g.adjList[pocetok], visited, zatrupan);
+        for (Integer integer : visited) { 
+            if(g.adjList[integer].getInfo().zatrupan) cnt++; //zatrupanite na koi sme im odnele hrana
+        }
+        System.out.println(cnt);
+       // System.out.println(visited.size()); posetenite gradovi
+
+    }
+
+    static void kamion(GraphNode<City> node, List<Integer> visited, int zatrupan){
+        if(visited.contains(node.getIndex())) return;
+        visited.add(node.getIndex());
+
+        LinkedList<GraphNode<City>> sosedi = node.getNeighbors();
+        for (GraphNode<City> sosed : sosedi) {
+            if(sosed.getInfo().zatrupan) zatrupan++;
+            if(zatrupan <= 2) {
+                //visited.add(sosed.getIndex());
+                if(zatrupan == 2) zatrupan = 1;
+
+                if(!visited.contains(sosed.getIndex())){
+                    if(node.getInfo().zatrupan && !sosed.getInfo().zatrupan) return;
+                    else kamion(sosed, visited, zatrupan);
+                }
+            }
+
+        }
+    }
+
+
+}
+
+class City {
+
+    boolean zatrupan;
+
+    City(boolean zatrupan) {
+        this.zatrupan = zatrupan;
+    }
+
+    @Override
+    public String toString() {
+        if (zatrupan == true) {
+            return "zatrupan";
+        } else {
+            return "nezatrupan";
+        }
+    }
+}
+class Graph {
+
+    int num_nodes;
+    GraphNode<City> adjList[];
+
+    @SuppressWarnings("unchecked")
+    public Graph(int num_nodes) {
+        this.num_nodes = num_nodes;
+        adjList = (GraphNode<City>[]) new GraphNode[num_nodes];
+    }
+
+    int adjacent(int x, int y) {
+        // proveruva dali ima vrska od jazelot so
+        // indeks x do jazelot so indeks y
+        return (adjList[x].containsNeighbor(adjList[y])) ? 1 : 0;
+    }
+
+    void addEdge(int x, int y) {
+        // dodava vrska od jazelot so indeks x do jazelot so indeks y
+        if (!adjList[x].containsNeighbor(adjList[y])) {
+            adjList[x].addNeighbor(adjList[y]);
+        }
+    }
+
+    void deleteEdge(int x, int y) {
+        adjList[x].removeNeighbor(adjList[y]);
+    }
+
+    @Override
+    public String toString() {
+        String ret = new String();
+        for (int i = 0; i < this.num_nodes; i++) {
+            ret += i + ": " + adjList[i] + "\n";
+        }
+        return ret;
+    }
+}
+
+class GraphNode<E> {
+
+    private int index;//index (reden broj) na temeto vo grafot
+    private E info;
+    private LinkedList<GraphNode<E>> neighbors;
+
+
+
+    public GraphNode(int index, E info) {
+        this.index = index;
+        this.info = info;
+        neighbors = new LinkedList<GraphNode<E>>();
+    }
+
+    boolean containsNeighbor(GraphNode<E> o) {
+        return neighbors.contains(o);
+    }
+
+    void addNeighbor(GraphNode<E> o) {
+        neighbors.add(o);
+    }
+
+    void removeNeighbor(GraphNode<E> o) {
+        if (neighbors.contains(o)) {
+            neighbors.remove(o);
+        }
+    }
+
+
+    @Override
+    public String toString() {
+        String ret = "INFO:" + info + " SOSEDI:";
+        for (int i = 0; i < neighbors.size(); i++) {
+            ret += neighbors.get(i).info + " ";
+        }
+        return ret;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        @SuppressWarnings("unchecked")
+        GraphNode<E> pom = (GraphNode<E>) obj;
+        return (pom.info.equals(this.info));
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public E getInfo() {
+        return info;
+    }
+
+    public void setInfo(E info) {
+        this.info = info;
+    }
+
+    public LinkedList<GraphNode<E>> getNeighbors() {
+        return neighbors;
+    }
+
+    public void setNeighbors(LinkedList<GraphNode<E>> neighbors) {
+        this.neighbors = neighbors;
+    }
+}
