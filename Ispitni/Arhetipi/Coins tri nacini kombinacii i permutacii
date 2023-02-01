@@ -1,0 +1,58 @@
+package Zad;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+
+public class Chocolate {
+    public static int[] coins_mnozestvo = {1,2};
+
+    public static int dp_coins_kombinacii(int n){
+        int [] kombinacii = new int[n+1];
+
+        kombinacii[0] = 1;
+
+        for (int coin : coins_mnozestvo) {
+            for (int i = 1; i < n+1; i++) {
+                if(i >= coin){
+                    kombinacii[i]+= kombinacii[i - coin];
+                }
+            }
+        }
+        return kombinacii[n];
+    }
+
+    public static int kombinacii(int n, int currentCoin){
+        if(n == 0) return 1; //nashol eden nachin
+        if(n < 0) return 0; //ne nashol kombinacija
+        //dokolku e ushte nad 0
+        int combo = 0;
+        for (int i = currentCoin; i < coins_mnozestvo.length; i++) {
+            combo+= kombinacii(n - coins_mnozestvo[i], i);
+        }
+        return combo;
+    }
+    //permutacii
+    public static int chocolate(int n)
+    {
+        if(n == 0) return 1; //nashol eden nachin
+        if(n < 0) return 0; //ne nashol kombinacija
+        //dokolku e ushte nad 0
+        int perm = 0;
+        for (int i = 0; i < coins_mnozestvo.length; i++) {
+            perm+= chocolate(n - coins_mnozestvo[i]);
+        }
+        return perm;
+    }
+
+    public static void main(String[] args) throws Exception {
+        //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        //int n = Integer.parseInt(br.readLine());
+        int n = 4;
+        System.out.println("Permutacii:" + chocolate(n));
+        System.out.println("Kombinacii:" + kombinacii(n, 0));
+        System.out.println("Dinamicko kombinacii:" + dp_coins_kombinacii(n));
+
+    }
+
+}
