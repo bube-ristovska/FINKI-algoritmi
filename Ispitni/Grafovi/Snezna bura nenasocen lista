@@ -196,7 +196,6 @@ class GraphNode<E> {
     public LinkedList<GraphNode<E>> getNeighbors() {
         return neighbors;
     }
-
     public void setNeighbors(LinkedList<GraphNode<E>> neighbors) {
         this.neighbors = neighbors;
     }
