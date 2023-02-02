@@ -1,0 +1,28 @@
+package DPfav;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+
+public class Bilet {
+
+    public static int bilet(int n)
+    {
+        int [] mnozestvo = {1,2};
+        if(n < 0) return 0;
+        if(n == 0) return 1;
+        int permutacii = 0;
+        for (int i = 0; i < mnozestvo.length; i++) {
+            permutacii += bilet(n - mnozestvo[i]);
+        }
+
+        return permutacii;
+    }
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        System.out.println(bilet(n));
+    }
+
+}
