@@ -1,0 +1,187 @@
+package Zavod;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+class MapEntry<K extends Comparable<K>,E> implements Comparable<K> {
+
+    // Each MapEntry object is a pair consisting of a key (a Comparable
+    // object) and a value (an arbitrary object).
+    K key;
+    E value;
+
+    public MapEntry (K key, E val) {
+        this.key = key;
+        this.value = val;
+    }
+
+    public int compareTo (K that) {
+        // Compare this map entry to that map entry.
+        @SuppressWarnings("unchecked")
+        MapEntry<K,E> other = (MapEntry<K,E>) that;
+        return this.key.compareTo(other.key);
+    }
+
+    public String toString () {
+        return "<" + key + "," + value + ">";
+    }
+}
+
+
+class CBHT<K extends Comparable<K>, E> {
+
+    // An object of class CBHT is a closed-bucket hash table, containing
+    // entries of class MapEntry.
+    private SLLNode<MapEntry<K,E>>[] buckets;
+
+    @SuppressWarnings("unchecked")
+    public CBHT(int m) {
+        // Construct an empty CBHT with m buckets.
+        buckets = (SLLNode<MapEntry<K,E>>[]) new SLLNode[m];
+    }
+
+    private int hash(K key) {
+        // Translate key to an index of the array buckets.
+        return Math.abs(key.hashCode()) % buckets.length;
+        //ako beshe so lista
+       // return (100 * key.toString().charAt(0) + key.toString().charAt(1)) % 9091;
+    }
+
+    public SLLNode<MapEntry<K,E>> search(K targetKey) {
+        // Find which if any node of this CBHT contains an entry whose key is
+        // equal
+        // to targetKey. Return a link to that node (or null if there is none).
+        int b = hash(targetKey);
+        for (SLLNode<MapEntry<K,E>> curr = buckets[b]; curr != null; curr = curr.succ) {
+            if (targetKey.equals(((MapEntry<K, E>) curr.element).key))
+                return curr;
+        }
+        return null;
+    }
+
+    public void insert(K key, E val) {		// Insert the entry <key, val> into this CBHT.
+        MapEntry<K, E> newEntry = new MapEntry<K, E>(key, val);
+        int b = hash(key);
+        for (SLLNode<MapEntry<K,E>> curr = buckets[b]; curr != null; curr = curr.succ) {
+            if (key.equals(((MapEntry<K, E>) curr.element).key)) {
+                // Make newEntry replace the existing entry ...
+                curr.element = newEntry;
+                return;
+            }
+        }
+        // Insert newEntry at the front of the 1WLL in bucket b ...
+        buckets[b] = new SLLNode<MapEntry<K,E>>(newEntry, buckets[b]);
+    }
+
+    public void delete(K key) {
+        // Delete the entry (if any) whose key is equal to key from this CBHT.
+        int b = hash(key);
+        for (SLLNode<MapEntry<K,E>> pred = null, curr = buckets[b]; curr != null; pred = curr, curr = curr.succ) {
+            if (key.equals(((MapEntry<K,E>) curr.element).key)) {
+                if (pred == null)
+                    buckets[b] = curr.succ;
+                else
+                    pred.succ = curr.succ;
+                return;
+            }
+        }
+    }
+
+    public String toString() {
+        String temp = "";
+        for (int i = 0; i < buckets.length; i++) {
+            temp += i + ":";
+            for (SLLNode<MapEntry<K,E>> curr = buckets[i]; curr != null; curr = curr.succ) {
+                temp += curr.element.toString() + " ";
+            }
+            temp += "\n";
+        }
+        return temp;
+    }
+
+}
+
+class Name{
+    String name;
+    int frequency;
+
+    public Name(String name) {
+        this.name = name;
+        frequency = 1;
+    }
+    public void increment_frequency(){
+        frequency+=1;
+    }
+}
+
+public class Statistika {
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+        int i = 0, N = 5;
+        CBHT<String, Name> zhenski = new CBHT<String, Name>(N*N*2);
+        CBHT<String, Name> mashki = new CBHT<String, Name>(N*N*2);
+        String pol_prebaruva="", ime_prebaruva="";
+
+        while (scanner.hasNext()){
+            String line = scanner.nextLine();
+            if(line.equals("KRAJ")) {
+                pol_prebaruva = scanner.nextLine();
+                ime_prebaruva = scanner.nextLine();
+                break;
+            }
+            if(i == 0) {N = Integer.parseInt(line); i++;}
+            else{
+                String [] deleno = line.split("\\s+");
+                if(deleno[1].equals("M")){
+                    SLLNode<MapEntry<String, Name>> query = mashki.search(deleno[1]);
+                    if(query == null){
+                        Name novo = new Name(deleno[0]);
+                        mashki.insert(deleno[0], novo);
+                    }else {
+                        query.element.value.increment_frequency();
+                    }
+                }
+                else{
+                    SLLNode<MapEntry<String, Name>> query = zhenski.search(deleno[0]);
+                    if(query == null){
+                        Name novo = new Name(deleno[0]);
+                        zhenski.insert(deleno[0], novo);
+                    }else {
+                        query.element.value.increment_frequency();
+                    }
+                }
+            }
+        }
+
+        SLLNode<MapEntry<String, Name>> query = null;
+        if(pol_prebaruva.equals("M")){
+           query = mashki.search(ime_prebaruva);
+        }else{
+            query = zhenski.search(ime_prebaruva);
+        }
+
+        if(query == null){
+            System.out.println("Nema takvo ime");
+        }else{
+            System.out.println(ime_prebaruva + " so frequency:" + query.element.value.frequency);
+        }
+
+    }
+}
