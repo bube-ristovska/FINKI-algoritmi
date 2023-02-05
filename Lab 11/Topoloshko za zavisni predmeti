@@ -1,0 +1,210 @@
+package Aips;
+
+import java.util.*;
+
+class Graph<E> {
+
+    int num_nodes;
+    GraphNode<E> adjList[];
+
+    @SuppressWarnings("unchecked")
+    public Graph(int num_nodes, E[] list) {
+        this.num_nodes = num_nodes;
+        adjList = (GraphNode<E>[]) new GraphNode[num_nodes];
+        for (int i = 0; i < num_nodes; i++)
+            adjList[i] = new GraphNode<E>(i, list[i]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Graph(int num_nodes) {
+        this.num_nodes = num_nodes;
+        adjList = (GraphNode<E>[]) new GraphNode[num_nodes];
+        for (int i = 0; i < num_nodes; i++)
+            adjList[i] = new GraphNode<E>(i, null);
+    }
+
+    int adjacent(int x, int y) {
+        // proveruva dali ima vrska od jazelot so
+        // indeks x do jazelot so indeks y
+        return (adjList[x].containsNeighbor(adjList[y])) ? 1 : 0;
+    }
+
+    void addEdge(int x, int y) {
+        // dodava vrska od jazelot so indeks x do jazelot so indeks y
+        if (!adjList[x].containsNeighbor(adjList[y])) {
+            adjList[x].addNeighbor(adjList[y]);
+        }
+    }
+
+    void deleteEdge(int x, int y) {
+        adjList[x].removeNeighbor(adjList[y]);
+    }
+
+    /************************TOPOLOGICAL SORT*******************************************************************/
+
+    void dfsVisit(Stack<Integer> s, int i, boolean[] visited) {
+        if (!visited[i]) {
+            visited[i] = true;
+            Iterator<GraphNode<E>> it = adjList[i].getNeighbors().iterator();
+            // System.out.println("dfsVisit: "+i+" Stack="+s);
+            while (it.hasNext()) {
+                dfsVisit(s, it.next().getIndex(), visited);
+            }
+            s.push(i);
+            //System.out.println("--dfsVisit: "+i+" Stack="+s);
+        }
+    }
+
+    int[] topological_sort_dfs() { //izmeni ne da gi printa tuku da gi vrakja kako niza
+        boolean visited[] = new boolean[num_nodes];
+        int[] sortirani = new int[num_nodes];
+        for (int i = 0; i < num_nodes; i++) {
+            visited[i] = false;
+        }
+
+        Stack<Integer> s = new Stack<Integer>();
+
+        for (int i = 0; i < num_nodes; i++) {
+            dfsVisit(s, i, visited);
+        }
+        //System.out.println("----Stack="+s);
+        int i = 0;
+        while (!s.isEmpty()) {
+            sortirani[i++] = adjList[s.pop()].getIndex();
+        }
+        return sortirani;
+    }
+
+    /***********************************************************************************************************/
+
+    @Override
+    public String toString() {
+        String ret = new String();
+        for (int i = 0; i < this.num_nodes; i++)
+            ret += i + ": " + adjList[i] + "\n";
+        return ret;
+    }
+
+}
+
+class GraphNode<E> {
+    private int index;//index (reden broj) na temeto vo grafot
+    private E info;
+    private LinkedList<GraphNode<E>> neighbors;
+
+    public GraphNode(int index, E info) {
+        this.index = index;
+        this.info = info;
+        neighbors = new LinkedList<GraphNode<E>>();
+    }
+
+    boolean containsNeighbor(GraphNode<E> o) {
+        return neighbors.contains(o);
+    }
+
+    void addNeighbor(GraphNode<E> o) {
+        neighbors.add(o);
+    }
+
+
+    void removeNeighbor(GraphNode<E> o) {
+        if (neighbors.contains(o))
+            neighbors.remove(o);
+    }
+
+
+    @Override
+    public String toString() {
+        String ret = "INFO:" + info + " SOSEDI:";
+        for (int i = 0; i < neighbors.size(); i++)
+            ret += neighbors.get(i).info + " ";
+        return ret;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        @SuppressWarnings("unchecked")
+        GraphNode<E> pom = (GraphNode<E>) obj;
+        return (pom.info.equals(this.info));
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public E getInfo() {
+        return info;
+    }
+
+    public void setInfo(E info) {
+        this.info = info;
+    }
+
+    public LinkedList<GraphNode<E>> getNeighbors() {
+        return neighbors;
+    }
+
+    public void setNeighbors(LinkedList<GraphNode<E>> neighbors) {
+        this.neighbors = neighbors;
+    }
+
+
+}
+
+public class TopologicalSort {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<String> predmeti = new ArrayList<>();
+        HashMap<String, Integer> redenByPredmetName = new HashMap<>();
+        HashMap<Integer, String> predmetByRedenBr = new HashMap<>();
+
+        int N_nodes = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < N_nodes; i++) {
+            String line = scanner.nextLine();
+            predmeti.add(line);
+            redenByPredmetName.put(line, i); //kako shto se vneseni
+            predmetByRedenBr.put(i, line);
+        }
+
+        Graph<String> graph = new Graph<>(N_nodes, predmeti.toArray(new String[N_nodes]));
+
+        int M_edges = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < M_edges; i++) {
+            String line = scanner.nextLine();
+            String[] splitted = line.split("\\s+");
+            int to = redenByPredmetName.get(splitted[0]);
+            for (int j = 1; j < splitted.length; j++) { //ime_predmet i dr predmeti natamu(1 do splitted.lenght)
+                String from_s = splitted[j];
+                int from = redenByPredmetName.get(from_s);
+                graph.addEdge(from, to);
+            }
+        }
+
+        String posleden_predmet = scanner.nextLine();
+        scanner.close();
+
+        int posleden_reden_br = redenByPredmetName.get(posleden_predmet);
+
+        int[] indexes_by_sortirani = graph.topological_sort_dfs();
+
+        int i;
+        for (i = 0; i < indexes_by_sortirani.length; i++) {
+            if(indexes_by_sortirani[i] == posleden_reden_br) break;
+        }
+
+        System.out.println(predmetByRedenBr.get(indexes_by_sortirani[i+1]));
+
+
+        /*
+        ti vrakja indeksi na sortirani kako idat po red ti treba da go najdesh indeksot na predmetot koj go barame
+        ti treba da go najdesh indeksot na predmetot posle nego i da go zemesh od grafot
+        */
+
+
+    }
+}
