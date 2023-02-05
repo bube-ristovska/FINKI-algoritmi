@@ -450,10 +450,10 @@ public class Networking {
         scanner.close();
         int reden_pretsedatel = redenByName.get(pretsedatel);
 
-       float[] result = graph.dijkstra(reden_pretsedatel);
+       List<Edge> result = graph.prim(reden_pretsedatel);
        int s = 0;
-        for (float num : result) {
-            s+= (int)num;
+        for (Edge edge : result) {
+            s+= edge.getWeight();
         }
         System.out.println(s);
     }
