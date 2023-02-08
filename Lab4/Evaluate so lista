@@ -1,0 +1,61 @@
+package lab4;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Evaluate {
+
+    public static int evaluate(int x, int y, String oper){
+        switch (oper){
+            case "+":return x+y;
+            case "-":return x-y;
+        }
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String eval = scanner.nextLine();
+        scanner.close();
+        List<String> chars = new ArrayList<>();
+        char[] char_arr = eval.toCharArray();
+        for (char c : char_arr) {
+            chars.add(String.valueOf(c));
+        }
+        while (chars.size() != 1) {
+            for (int i = 0; i < chars.size(); i++) {
+                if(i+2 < chars.size()){
+                    if (isStringNumber(chars.get(i)) && isStringNumber(chars.get(i+2))) {
+                        int num1 = Integer.parseInt(chars.get(i));
+                        int num2 = Integer.parseInt(chars.get(i + 2));
+                        String oper = chars.get(i + 1);
+                        int evaluation = evaluate(num1, num2, oper);
+                        chars.remove(i-1);
+                        chars.remove(i-1);
+                        chars.remove(i-1);
+                        chars.remove(i-1);
+                        chars.remove(i-1);
+                        chars.add(i-1, String.valueOf(evaluation));
+
+                    }
+                }
+            }
+        }
+        System.out.println(chars.get(0));
+    }
+
+    public static boolean isStringNumber(String num){
+        char[] c = num.toCharArray();
+        //ako e -5
+        if(c.length == 1){
+           if (c[0] =='-') return false;
+           return Character.isDigit(c[0]);
+        }
+        for (int i = 1; i < c.length; i++) {
+            if(!Character.isDigit(c[i])) return false;
+        }
+        return true;
+    }
+
+}
