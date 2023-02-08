@@ -1,0 +1,109 @@
+package lab5;
+
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+interface Stack<E> {
+    // Elementi na stekot se objekti od proizvolen tip.
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako stekot e prazen.
+
+    public E peek();
+    // Go vrakja elementot na vrvot od stekot.
+
+    // Metodi za transformacija:
+    public void clear();
+    // Go prazni stekot.
+
+    public void push(E x);
+    // Go dodava x na vrvot na stekot.
+
+    public E pop();
+    // Go otstranuva i vrakja elementot shto e na vrvot na stekot.
+}
+
+class ArrayStack<E> implements Stack<E> {
+    private E[] elems; //elems[0...depth-1] se negovite elementi.
+    private int depth; //depth e dlabochinata na stekot
+
+    @SuppressWarnings("unchecked")
+    public ArrayStack(int maxDepth) {
+        // Konstrukcija na nov, prazen stek.
+        elems = (E[]) new Object[maxDepth];
+        depth = 0;
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako stekot e prazen.
+        return (depth == 0);
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot od stekot.
+        if (depth == 0)
+            throw new NoSuchElementException();
+        return elems[depth - 1];
+    }
+
+    public void clear() {
+        // Go prazni stekot.
+        for (int i = 0; i < depth; i++) elems[i] = null;
+        depth = 0;
+    }
+
+    public void push(E x) {
+        // Go dodava x na vrvot na stekot.
+        elems[depth++] = x;
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na stack-ot.
+        return depth;
+    }
+
+    public E pop() {
+        // Go otstranuva i vrakja elementot shto e na vrvot na stekot.
+        if (depth == 0)
+            throw new NoSuchElementException();
+        E topmost = elems[--depth];
+        elems[depth] = null;
+        return topmost;
+    }
+}
+
+public class PostFixPolish {
+    public static void main(String[] args) {
+        Stack<String> stack = new ArrayStack<>(100);
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        scanner.close();
+
+        String[] nums_and_oper = line.split("\\s+");
+
+        for (String operand : nums_and_oper) {
+            if (operand.equals("+") || operand.equals("-") ||
+                    operand.equals("*") || operand.equals("/")) {
+                int num2 = Integer.parseInt(stack.pop());
+                int num1 = Integer.parseInt(stack.pop());
+                stack.push(eval(num1, num2, operand));
+            }
+            else{
+                stack.push(operand);
+            }
+        }
+        System.out.println(stack.pop());
+    }
+
+    static String eval(int num1, int num2, String oper) {
+        switch (oper){
+            case "+": return String.valueOf(num1+num2);
+            case "-": return String.valueOf(num1-num2);
+            case "*": return String.valueOf(num1*num2);
+            case "/": return String.valueOf(num1/num2);
+        }
+        return "null";
+    }
+
+}
