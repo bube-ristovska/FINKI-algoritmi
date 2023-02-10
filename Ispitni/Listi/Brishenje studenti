@@ -85,7 +85,7 @@ class SLL<E> {
         } else {
             System.out.println("Listata e prazna");
         }
-    }
+    } 
 
     public SLLNode<E> insertLast(E o) {
         if (first != null) {
