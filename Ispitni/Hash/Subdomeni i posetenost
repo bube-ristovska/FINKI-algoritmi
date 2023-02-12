@@ -1,0 +1,54 @@
+/*
+2 КОЛОКВИУМ 2018/19
+
+Sample Input:
+3
+os.finki.ukim.mk 500
+iknow.ukim.mk 500
+google.mk 500
+
+Sample Output:
+os.finki.ukim.mk 500
+iknow.ukim.mk 500
+google.mk 500
+finki.ukim.mk 500
+ukim.mk 1000
+mk 1500
+*/
+
+package Heshovi;
+
+import java.util.*;
+
+public class DomainVisits {
+    public static void main(String[] args) {
+        Map<String, Integer> mapByName = new HashMap<>();
+        Scanner scanner = new Scanner(System.in);
+        int N = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < N; i++) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(" "); //os.finki.ukim.mk 500
+            String domain = parts[0];
+            int visits = Integer.parseInt(parts[1]);
+            mapByName.put(domain, visits);
+            for (int j = 0; j < domain.length(); j++) {
+                if(domain.charAt(j) == '.'){
+                    String subdomain = domain.substring(j+1);
+                    if(mapByName.containsKey(subdomain)){
+                        mapByName.compute(subdomain, (k,v) -> v + visits);
+                    }
+                    else {
+                        mapByName.put(subdomain, visits); //.finki.ukim.mk 500 ili ukim.mk 500
+
+                    }
+                }
+            }
+        }
+
+        for (String str : mapByName.keySet()) {
+            System.out.println(str + " " + mapByName.get(str));
+        }
+
+
+    }
+}
