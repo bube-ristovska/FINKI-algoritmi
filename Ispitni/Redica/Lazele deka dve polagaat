@@ -1,0 +1,215 @@
+package Queue;/*
+*Се организира прв колоквиум по предметот Алгоритми и структури на податоци. За таа цел
+ *се отвара анкета по предметот на која студентите се пријавуваат.
+Анкетата има дадено 2 избори:
+1)	Полагам во било кој термин
+2)	Испитот ми се преклопува со Математика
+Студентите се поставуваат во термините според редоследите во кои се примени (почнувајќи од
+првиот). Сите студенти сакаат да полагаат колку е можно порано па затоа дел од студентите
+мамат и во анкетата наведуваат дека истиот ден полагаат и Математика. Асистентите бараат
+список на студенти кои полагаат Математика и добиваат. Потоа се започнува со распределба на
+студентите во термини: прво во термините се доделуваат студентите кои се пријавиле дека
+полагаат и Математика (по редоследот по кој се пријавиле), меѓутоа секој од овие студенти
+се проверува дали навистина полага и Математика и ако мамел се сместува на крај од
+списокот на студенти кои избрале дека полагаат било кој термин. Потоа се изминуваат
+останатите студенти и се доделуваат во термини.
+
+Влез: Се дава прво капацитетот на студенти по термин (т.е. по колку студенти во еден термин
+може да полагаат). Следно се дава бројот и списокот на студенти кои истиот ден полагаат и
+Математика (според редоследот по кој се пријавиле). Потоа се дава бројот и списокот на
+останатите студенти (според редоследот по кој се пријавиле). На крај се дава број и список
+ на студенти кои навистина полагаат Математика. На излез се печати број на термин, па
+ студентите кои полагаат во тој термин.
+
+ Sample input
+2
+4
+IlinkaIvanoska
+IgorKulev
+MagdalenaKostoska
+HristinaMihajloska
+3
+VladimirTrajkovik
+SlobodanKalajdziski
+AnastasMisev
+1
+IlinkaIvanoska
+Sample output
+1
+IlinkaIvanoska
+VladimirTrajkovik
+2
+SlobodanKalajdziski
+AnastasMisev
+3
+IgorKulev
+MagdalenaKostoska
+4
+HristinaMihajloska
+*/
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+public class Ispit {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int capacity = Integer.parseInt(scanner.nextLine());
+        int N_both = Integer.parseInt(scanner.nextLine());
+        Queue<String> both = new LinkedQueue<String>();
+        for (int i = 0; i < N_both; i++) {
+            String line = scanner.nextLine();
+            ;
+            both.enqueue(line);
+        }
+
+        int M_ostanati = Integer.parseInt(scanner.nextLine());
+        Queue<String> ostanati = new LinkedQueue<String>();
+        for (int i = 0; i < M_ostanati; i++) {
+            String line = scanner.nextLine();
+            ;
+            ostanati.enqueue(line);
+        }
+
+        List<String> realno = new ArrayList<>();
+        int K_realno = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < K_realno; i++) {
+            String line = scanner.nextLine();
+            realno.add(line);
+        }
+
+        int cnt_termin = 1;
+        System.out.println(cnt_termin);
+        int dodadeni = 0;
+        while (!both.isEmpty() || !ostanati.isEmpty()) {
+            if (!both.isEmpty()) {
+                String pom = both.dequeue();
+                if (realno.contains(pom)) {
+                    System.out.println(pom);
+                    dodadeni++;
+                } else {
+                    ostanati.enqueue(pom);
+                }
+            } else {
+                System.out.println(ostanati.dequeue());
+                dodadeni++;
+            }
+            if (dodadeni == capacity) {
+                dodadeni = 0;
+                cnt_termin++;
+                System.out.println(cnt_termin);
+            }
+        }
+    }
+}
