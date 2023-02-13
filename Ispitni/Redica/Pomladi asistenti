@@ -1,0 +1,229 @@
+package Queue;/*
+*Се организира колоквиумска недела на ФИНКИ и за таа цел асистентите се доделуваат за
+ *чување на испити. За таа цел се прави редица од асистентите во која на почеток се
+ *nајмладите асистенти, а на крај се највозрасните. Потоа се даваат предметите и по колку
+ *асистенти се потребни за чување на секој предмет.Има некои асистенти кои се отсутни
+ *во тековната колоквиумска недела. Затоа дополнително се дава список кои од асистентите
+ *се отсутни. Асистентите се доделуваат на следниот начин: Прво се доделуваат најмладите,
+ *а на крај најстарите, со тоа што ако некој асистент е отсутен тој се игнорира во редицата.
+ *После секое доделување на предмет асистентот се сместува на крај на редицата (т.е. ако на
+ *секој асистент му се доделил за чување предмет, а има потреба од уште асистенти, повторно
+ *се започнува од најмладите).
+Влез: Се дава прво бројот на асистенти и имињата на асистентите од најмлад до најстар.
+Следно се дава бројот на предмети за кои се потребни асистенти, па се наведуваат предметите
+и по колку асистенти се потребни за секој предмет. Потоа се дава бројот на асистенти кои се
+отсутни и списокот на тековно отсутните асистенти.
+На излез се печати предмет, па асистенти задолжени за чување на тој предмет (за секој од дадените предмети).*/
+
+/*Sample input
+4
+IlinkaIvanoska
+IgorKulev
+MagdalenaKostoska
+HristinaMihajloska
+3
+APS 3
+MIS 1
+OOS 2
+1
+HristinaMihajloska
+
+Sample output
+APS
+3
+IlinkaIvanoska
+IgorKulev
+MagdalenaKostoska
+MIS
+1
+IlinkaIvanoska
+OOS
+2
+IgorKulev
+MagdalenaKostoska
+*/
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+
+class Predmet {
+    String name;
+    int num_asistenti;
+    List<String> asistenti;
+
+    public Predmet(String name, String num_asistenti) {
+        this.name = name;
+        this.num_asistenti = Integer.parseInt(num_asistenti);
+        asistenti = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(name).append("\n");
+        stringBuilder.append(num_asistenti).append("\n");
+        for (int i = 0; i < asistenti.size(); i++) {
+            stringBuilder.append(asistenti.get(i));
+            if(i!= asistenti.size() - 1)
+               stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+}
+
+public class Asistenti {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        int N_asistenti = Integer.parseInt(scanner.nextLine());
+        Queue<String> asistenti = new LinkedQueue<String>();
+        for (int i = 0; i < N_asistenti; i++) {
+            String line = scanner.nextLine();
+            asistenti.enqueue(line);
+        }
+
+        int M_predmeti = Integer.parseInt(scanner.nextLine());
+        Queue<Predmet> predmeti = new LinkedQueue<Predmet>();
+        for (int i = 0; i < M_predmeti; i++) {
+            String line = scanner.nextLine();
+            String[] parts = line.split("\\s+");
+            Predmet predmet = new Predmet(parts[0], parts[1]);
+            predmeti.enqueue(predmet);
+        }
+
+        int K_otsutni = Integer.parseInt(scanner.nextLine());
+        List<String> otstutni = new ArrayList<>();
+        for (int i = 0; i < K_otsutni; i++) {
+            String line = scanner.nextLine();
+            otstutni.add(line);
+        }
+
+
+        while(!predmeti.isEmpty()){
+            Predmet pomPredmet = predmeti.dequeue();
+            for (int i = 0; i < pomPredmet.num_asistenti; i++) {
+                String pomAsistent = asistenti.dequeue();
+                if(!otstutni.contains(pomAsistent)){
+                    pomPredmet.asistenti.add(pomAsistent);
+                    asistenti.enqueue(pomAsistent);
+                }
+                else{
+                    i--;
+                }
+            }
+            System.out.println(pomPredmet);
+        }
+
+
+    }
+}
