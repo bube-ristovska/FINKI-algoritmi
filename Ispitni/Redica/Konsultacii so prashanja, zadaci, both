@@ -1,0 +1,206 @@
+/*
+/*Пред да започне колоквиумската недела на ФИНКИ се организираат консултации по предметот Алгоритми
+ *и структури на податоци. Бидејќи има голем број на заинтересирани студенти за консултации се
+ *објавува анкета на курсот за да се пријават студентите и тоа има два избора на анкетата (може да се изберат и двата):
+1)	Имам кратки прашања
+2)	Ми треба објаснување за некои задачи
+3)	И кратки прашања и објаснување за задачи
+Асистентката Магдалена ги држи консултациите. Студентите се примаат на консултации според следниот
+редослед: прво се примаат по еден студент од оние кои имаат кратки прашања според редоследот по кој
+се пријавиле. Ако нема еден од овие се пушта студенти кои кои имаат прашања и за задачи за да се
+исполни квотата од 1 студент,ама од овој прашува само кратки прашања. Ако се пуштил студент кој има
+и прашања за задачи тој се преместува на крај на редицата за задачи. Откако ќе се заврши овој
+студент со кратки прашања, се продолжува со оние кои имаат нејасни задачи. Од овие студенти се
+примаат 1. Ако нема еден од овие се пушта студент кој има прашања и за задачи за да се исполни
+квотата од 1 студент за задачи, ама овој прашува само за задачи, и потоа се преместува на крајот
+на редицата за кратки прашања. Понатаму се продолжува на истиот начин со тоа што за студентите кои
+се пријавиле и за задачи и за прашања влегуваат откако ќе се испразни редот со само кратки прашања
+или само со задачи. Студентите кои се пријавиле и за прашања и задачи, откако ќе завршат со прашањата
+се преместуваат на крај на редицата за задачи, и обратно. Кој ќе биде конечниот редослед на влегување?
+Влез: Се дава прво бројот на студенти кои се пријавиле за кратки прашања, а потоа се наведуваат
+студентите според редоследот на пријавување за кратки прашања, потоа истото за студентите кои се
+пријавиле само за задачи,па на крај студентите кои се пријавиле и за двете. На излез се печатат
+студентите според редоследот по кој влегле на консултации.
+Sample input
+4
+IlinkaIvanoska
+IgorKulev
+MagdalenaKostoska
+HristinaMihajloska
+2
+AnastasMishev
+VladimirTrajkovik
+1
+SlobodanKalajdziski
+Sample output
+IlinkaIvanoska
+AnastasMishev
+IgorKulev
+VladimirTrajkovik
+MagdalenaKostoska
+SlobodanKalajdziski
+HristinaMihajloska
+SlobodanKalajdziski
+*/
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+public class Konsultacii {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        Queue<String> questions = new LinkedQueue<>();
+        Queue<String> exercises = new LinkedQueue<>();
+        Queue<String> both = new LinkedQueue<>();
+        String line;
+
+        int N_questions = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < N_questions; i++) {
+            line = scanner.nextLine();
+            questions.enqueue(line);
+        }
+
+        int M_exercises = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < M_exercises; i++) {
+            line = scanner.nextLine();
+            exercises.enqueue(line);
+        }
+
+        int K_both = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < K_both; i++) {
+            line = scanner.nextLine();
+            both.enqueue(line);
+        }
+
+
+        while (!questions.isEmpty() || !exercises.isEmpty() || !both.isEmpty()) {
+            if (!questions.isEmpty()) {
+                System.out.println(questions.dequeue());
+            } else {
+                if(!both.isEmpty()){
+                    String pom = both.dequeue();
+                    System.out.println(pom);
+                    exercises.enqueue(pom);
+                }
+            }
+            if (!exercises.isEmpty()) {
+                System.out.println(exercises.dequeue());
+            } else {
+                if(!both.isEmpty()){
+                    String pom = both.dequeue();
+                    System.out.println(pom);
+                    questions.enqueue(pom);
+                }
+            }
+        }
+    }
+}
