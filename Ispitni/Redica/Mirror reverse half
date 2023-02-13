@@ -1,0 +1,247 @@
+package Queue;
+
+/*
+ * Write a method mirrorHalves that accepts a queue of integers as a parameter and replaces each half of that queue
+ * with itself plus a mirrored version of itself (the same elements in the opposite order).
+ * For example, suppose a queue variable q stores the following elements:
+ * front [10, 50, 19, 54, 30, 67] back
+ * After a call of mirrorHalves(q);, the queue would store the following elements:
+ * front [10, 50, 19, 19, 50, 10, 54, 30, 67, 67, 30, 54] back
+ * If your method is passed an empty queue, the result should be an empty queue.
+ * If your method is passed a null queue or one whose size is not even, your method should throw an IllegalArgumentException.
+ * You may use one stack or one queue (but not both) as auxiliary storage to solve this problem.
+ * You may not use any other auxiliary data structures to solve this problem, although you can have as many simple variables as you like.
+ * You may not use recursion to solve this problem.
+ * For full credit your code must run in O(n), n is the number of elements of the original queue.
+ */
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+interface Stack<E> {
+
+    // Elementi na stekot se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako stekot e prazen.
+
+    public E peek();
+    // Go vrakja elementot na vrvot od stekot.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Go prazni stekot.
+
+    public void push(E x);
+    // Go dodava x na vrvot na stekot.
+
+    public E pop();
+    // Go otstranuva i vrakja elementot shto e na vrvot na stekot.
+}
+
+class LinkedStack<E> implements Stack<E> {
+
+    //Stekot e pretstaven na sledniot nacin: top e link do prviot jazol
+// na ednostrano-povrzanata lista koja sodrzi gi elementite na stekot .
+    private SLLNode<E> top;
+
+    public LinkedStack() {
+        // Konstrukcija na nov, prazen stek.
+        top = null;
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako stekot e prazen.
+        return (top == null);
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot od stekot.
+        if (top == null)
+            throw new NoSuchElementException();
+        return top.element;
+    }
+
+    public void clear() {
+        // Go prazni stekot.
+        top = null;
+    }
+
+    public void push(E x) {
+        // Go dodava x na vrvot na stekot.
+        top = new SLLNode<E>(x, top);
+    }
+
+    public E pop() {
+        // Go otstranuva i vrakja elementot shto e na vrvot na stekot.
+        if (top == null)
+            throw new NoSuchElementException();
+        E topElem = top.element;
+        top = top.succ;
+        return topElem;
+    }
+
+}
+
+
+public class MirrorHalves {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+
+        LinkedQueue<Integer> ogRed = new LinkedQueue<Integer>();
+        String line = br.readLine();
+        String[] arr = line.split(", ");
+        for (int i = 0; i < n; i++) {
+            ogRed.enqueue(Integer.parseInt(arr[i]));
+        }
+        /*
+         6
+         10, 50, 19, 54, 30, 67*/
+
+        mirrorHalves(ogRed);
+        while (!ogRed.isEmpty()){
+            System.out.print(ogRed.dequeue() + ", ");
+        }
+    }
+
+    public static void mirrorHalves(LinkedQueue<Integer> ogRed) throws IllegalArgumentException {
+        if (ogRed == null) throw new IllegalArgumentException();
+        if (ogRed.size() % 2 != 0) throw new IllegalArgumentException();
+        Stack<Integer> stek = new LinkedStack<Integer>();
+        Integer pom;
+        int size = ogRed.size()/2;
+        for (int i = 0; i < size + 1;  i++) {
+            if (i != size) {
+                pom = ogRed.dequeue();
+                stek.push(pom);
+                ogRed.enqueue(pom);
+            }
+            if (i == size) {
+                while (!stek.isEmpty())
+                    ogRed.enqueue(stek.pop());
+            }
+        }
+        for (int i = 0; i < size + 1; i++) {
+            if (i != size) {
+                pom = ogRed.dequeue();
+                stek.push(pom);
+                ogRed.enqueue(pom);
+            }
+            if (i == size) {
+                while (!stek.isEmpty())
+                    ogRed.enqueue(stek.pop());
+            }
+        }
+    }
+}
