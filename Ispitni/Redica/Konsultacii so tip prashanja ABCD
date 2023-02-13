@@ -1,0 +1,191 @@
+package Queue;/*
+*Кај асистентот Игор се одржуваат консултации по два предмети АСП и ММС во еден термин. Бидејќи по
+ *АПС колоквиумот е следниот ден, Игор им рекол на студентите кои шточекаат дека прво ќе ги услужи
+ *студентите по АПС, а после студентите по ММС. Студентите се подготвиле со прашања и прашањата за
+ *АПС можат да бидат од тип А, B, C или D.Асистентот им напоменал на студентите по АПС, ако дојде
+ *некој студент и праша прашање од тип X (X e A,B,C или D) и веднаш после него дојде студент со прашање
+ *од тип X(т.е. со прашање од ист тип), вториот студент ќе биде ставен на крајот од редот и истовремено
+ *ќе биде пуштен еден студент од другата редица за ММС (ако таа редица не е празна). Генерално, ако
+ *последното одговорено прашање по АПС е од тип X, и дојде студент со прашање од тип X, тој се
+ *преместува на крајот од редот и се пушта еден студент од другата редица за ММС (ако таа редица не е празна).
+Влез: Се дава прво бројот на студенти кои се пријавиле за консултации АПС, а потоа се наведуваат
+студентите според редоследот на пријавување и се дава за кој тип прашање се пријавиле (A, B, C или D)
+Следно се дава бројот на студенти кои се пријавиле за консултации ММС, а потоа се наведуваат студентите
+ според редоследот на пријавување.
+ На излез се печатат студентите според редоследот по кој влегле на консултации.
+
+  Sample input
+3
+IlinkaIvanoska A
+MagdalenaKostoska A
+HristinaMihajloska B
+1
+IgorKulev
+  Sample output
+IlinkaIvanoska
+IgorKulev
+HristinaMihajloska
+MagdalenaKostoska
+*/
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Scanner;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+class Student {
+    String name;
+    String type;
+
+    public Student(String name, String type) {//za aps
+        this.name = name;
+        this.type = type;
+    }
+}
+
+public class Konsultacii {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Queue<Student> apsQueue = new LinkedQueue<Student>();
+        Queue<String> mmsQueue = new LinkedQueue<String>();
+
+        int N = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < N; i++) {
+            String line = scanner.nextLine();
+            String[] parts = line.split("\\s+"); //Magde A
+            Student student = new Student(parts[0], parts[1]);
+            apsQueue.enqueue(student);
+        }
+
+        int M = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < M; i++) {
+            String line = scanner.nextLine();
+            mmsQueue.enqueue(line);
+        }
+
+        while (!apsQueue.isEmpty() || !mmsQueue.isEmpty()) {
+            boolean flag = false;
+            if (!apsQueue.isEmpty()) {
+                Student pom = apsQueue.dequeue();
+                System.out.println(pom.name);
+                if (!apsQueue.isEmpty())
+                    if (Objects.equals(apsQueue.peek().type, pom.type)) {
+                        apsQueue.enqueue(apsQueue.dequeue());
+                        flag = true;
+                    }
+                if (flag && !mmsQueue.isEmpty()) {
+                    System.out.println(mmsQueue.dequeue());
+                }
+            }
+        }
+
+    }
+}
